@@ -1,4 +1,17 @@
+<<<<<<< HEAD
+=======
+
+# RStudio
+>>>>>>> 9b5760aa3e294a1235b7d0897afa46082b68e132
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+<<<<<<< HEAD
+=======
+
+# Quarto / knitr cache
+_cache/
+*.nb.html
+
+>>>>>>> 9b5760aa3e294a1235b7d0897afa46082b68e132
