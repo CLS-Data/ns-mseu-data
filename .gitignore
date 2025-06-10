@@ -1,4 +1,6 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
+/data_raw/
+/data_clean/
+/.Rhistory
+*.Rproj.user
+*.RData
+ns-mseu-data-github.Rproj
