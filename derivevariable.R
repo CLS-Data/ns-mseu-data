@@ -3,9 +3,10 @@
 library(haven)   # for reading SPSS/Stata files
 library(dplyr)
 library(purrr)
+library(here)
 
 # Set folder path
-data_path <- "/Users/alison/Library/CloudStorage/OneDrive-UniversityCollegeLondon/1_projectsrole/20222025_NextSteps/1_data/UKDA-5545-stata/stata/stata13/safeguarded_eul"
+data_path <- here("data", "UKDA-5545-stata", "stata", "stata13", "safeguarded_eul")
 
 # Define sweep file names (edit as necessary)
 sweeps <- list(
@@ -376,5 +377,122 @@ partnr_all <- partnr_all %>%
       W9DMARSTAT == -8 ~ -8,
       W9DMARSTAT == -1 ~ -1,
       TRUE ~ -2
+    )
+  )
+
+#### region ####
+region_vars <- list(
+  S2 = read_dta(file.path(data_path, sweeps$S2familybackground)) %>%
+    select(ID = NSID, regub15 = urbind, regov15 = gor),
+  S3 = read_dta(file.path(data_path, sweeps$S3familybackground)) %>%
+    select(ID = NSID, regub16 = urbind, regov16 = gor),
+  S8 = read_dta(file.path(data_path, sweeps$S8derivedvariable)) %>%
+    select(ID = NSID, regor25 = W8DGOR),
+  S9 = read_dta(file.path(data_path, sweeps$S9derivedvariable)) %>%
+    select(ID = NSID, regor32 = W9DRGN),
+  S9_2 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, regint32 = W9NATIONRES)
+)
+
+region_all <- reduce(region_vars, full_join, by = "ID")
+
+region_all <- region_all %>%
+  mutate(across(c(regub15, regub16), ~ case_when(
+    .x %in% 1:8 ~ .x,
+    .x == -94 ~ -2,
+    TRUE ~ -3
+  ))) %>%
+  
+  mutate(across(c(regov15, regov16), ~ case_when(
+    .x %in% 1:9 ~ .x,
+    .x == -94 ~ -2,
+    TRUE ~ -3
+  ))) %>%
+  
+  mutate(across(c(regor25, regor32), ~ case_when(
+    .x %in% 1:12 ~ .x,
+    .x == 13 ~ -2,                # faulty location
+    .x == -9 ~ -9,                # refused
+    .x == -8 ~ -8,                # don't know
+    .x == -1 ~ -1,                # not applicable
+    TRUE ~ -3                     # not participated
+  ))) %>%
+  
+  mutate(regint32 = case_when(
+    regint32 == 1 ~ 1,   # in the UK
+    regint32 == 2 ~ 2,   # abroad
+    regint32 == -9 ~ -9,
+    regint32 == -8 ~ -8,
+    regint32 == -3 ~ -3,
+    regint32 == -1 ~ -1,
+    TRUE ~ -3
+  ))
+
+#### education own ####
+region_vars <- list(
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson )) %>%
+    select(ID = NSID, educ17_raw = w4saim),
+  S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>%
+    select(ID = NSID, educ19_raw = W6Saim),
+  S7 = read_dta(file.path(data_path, sweeps$S7youngperson)) %>%
+    select(ID = NSID, educ20_raw = W7SAim),
+  S8 = read_dta(file.path(data_path, sweeps$S8maininterview)) %>%
+    select(ID = NSID, starts_with("W8ACQU"), starts_with("W8VCQU")),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, starts_with("W9ACQU"), starts_with("W9VCQU"))
+)
+
+#### education parents ####
+# Step 1: Load and rename relevant variables from each sweep
+parent_edu_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1familybackground)) %>%
+    select(ID = NSID, educma_S1 = W1hiqualmum, educpa_S1 = W1hiqualdad),
+  S2 = read_dta(file.path(data_path, sweeps$S2familybackground)) %>%
+    select(ID = NSID, educma_S2 = W2hiqualmum, educpa_S2 = W2hiqualdad),
+  S4 = read_dta(file.path(data_path, sweeps$S4familybackground)) %>%
+    select(ID = NSID, educma_S4 = w4hiqualmum, educpa_S4 = w4hiqualdad)
+)
+
+# Step 2: Merge all sweeps by ID
+parent_edu_all <- reduce(parent_edu_vars, full_join, by = "ID")
+
+# Step 3: Harmonise negative codes for all parental education vars
+parent_edu_all <- parent_edu_all %>%
+  mutate(across(
+    matches("educ(ma|pa)_S[1-4]"),
+    ~ case_when(
+      .x == -92 ~ -9,
+      .x == -91 ~ -1,
+      .x %in% c(-99, -98) ~ -3,
+      .x %in% c(-999, -94) ~ -2,
+      TRUE ~ .x
+    )
+  ))
+
+# Step 4: Derive educma (mother’s education)
+parent_edu_all <- parent_edu_all %>%
+  mutate(
+    educma = case_when(
+      !is.na(educma_S1) & educma_S1 > 0 ~ educma_S1,
+      !is.na(educma_S2) & educma_S2 > 0 ~ educma_S2,
+      !is.na(educma_S4) & educma_S4 > 0 ~ educma_S4,
+      !is.na(educma_S1) & educma_S1 < 0 ~ educma_S1,
+      !is.na(educma_S2) & educma_S2 < 0 ~ educma_S2,
+      !is.na(educma_S4) & educma_S4 < 0 ~ educma_S4,
+      TRUE ~ -3  # Not interviewed / present
+    )
+  )
+
+# Step 5: Derive educpa (father’s education)
+parent_edu_all <- parent_edu_all %>%
+  mutate(
+    educpa = case_when(
+      !is.na(educpa_S1) & educpa_S1 > 0 ~ educpa_S1,
+      !is.na(educpa_S2) & educpa_S2 > 0 ~ educpa_S2,
+      !is.na(educpa_S4) & educpa_S4 > 0 ~ educpa_S4,
+      !is.na(educpa_S1) & educpa_S1 < 0 ~ educpa_S1,
+      !is.na(educpa_S2) & educpa_S2 < 0 ~ educpa_S2,
+      !is.na(educpa_S4) & educpa_S4 < 0 ~ educpa_S4,
+      TRUE ~ -3
     )
   )
