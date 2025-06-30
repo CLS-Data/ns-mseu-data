@@ -246,6 +246,8 @@ lang_all <- lang_all %>%
 #### sexual orientation ####
 # Load sexuality variables
 sexuality_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% select(ID = NSID),
   S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>% select(ID = NSID, W6SexualityYP),
   S7 = read_dta(file.path(data_path, sweeps$S7youngperson)) %>% select(ID = NSID, W7SexualityYP),
   S8 = read_dta(file.path(data_path, sweeps$S8selfcompletion)) %>% select(ID = NSID, W8SEXUALITY),
@@ -266,7 +268,7 @@ sexuality_all <- sexuality_all %>%
       W6SexualityYP %in% c(-92, -9) ~ -9,
       W6SexualityYP %in% c(-91, -1, -8) ~ -8,
       W6SexualityYP %in% c(-999, -998, -997, -94) ~ -2,
-      TRUE ~ NA_real_
+      TRUE ~ -3
     ),
     
     sori20 = case_when(
@@ -278,7 +280,7 @@ sexuality_all <- sexuality_all %>%
       W7SexualityYP %in% c(-92, -9) ~ -9,
       W7SexualityYP %in% c(-91, -1, -8) ~ -8,
       W7SexualityYP %in% c(-999, -998, -997, -94) ~ -2,
-      TRUE ~ NA_real_
+      TRUE ~ -3
     ),
     
     sori25 = case_when(
@@ -290,7 +292,7 @@ sexuality_all <- sexuality_all %>%
       W8SEXUALITY == -8 ~ -8,
       W8SEXUALITY == -1 ~ -8,
       W8SEXUALITY %in% c(-999, -998, -997, -94) ~ -2,
-      TRUE ~ NA_real_
+      TRUE ~ -3
     ),
     
     sori32 = case_when(
@@ -303,12 +305,14 @@ sexuality_all <- sexuality_all %>%
       W9SORI %in% c(-8, -1) ~ -8,
       W9SORI == -3 ~ -3,
       W9SORI %in% c(-999, -998, -997, -94) ~ -2,
-      TRUE ~ NA_real_
+      TRUE ~ -3
     )
   )
 
 #### partnership ####
 partnr_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% select(ID = NSID),
   S5 = read_dta(file.path(data_path, sweeps$S5youngperson)) %>% select(ID = NSID, W5Marstat2YP),
   S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>% select(ID = NSID, W6MarStatYP),
   S8 = read_dta(file.path(data_path, sweeps$S8derivedvariable)) %>% select(ID = NSID, W8DMARSTAT),
@@ -326,7 +330,7 @@ partnr_all <- partnr_all %>%
       W5Marstat2YP == -92 ~ -9,
       W5Marstat2YP == -91 ~ -1,
       W5Marstat2YP == -1  ~ -8,
-      TRUE ~ -2
+      TRUE ~ -3
     ),
     
     partnr19 = case_when(
@@ -337,7 +341,7 @@ partnr_all <- partnr_all %>%
       W6MarStatYP == -91 ~ -1,
       W6MarStatYP == -1 ~ -8,
       W6MarStatYP %in% c(-997, -97) ~ -3,
-      TRUE ~ -2
+      TRUE ~ -3
     ),
     
     partnr25 = case_when(
@@ -347,7 +351,7 @@ partnr_all <- partnr_all %>%
       W8DMARSTAT == -9 ~ -9,
       W8DMARSTAT == -8 ~ -8,
       W8DMARSTAT == -1 ~ -1,
-      TRUE ~ -2
+      TRUE ~ -3
     ),
     
     partnr32 = case_when(
@@ -357,7 +361,7 @@ partnr_all <- partnr_all %>%
       W9DMARSTAT == -9 ~ -9,
       W9DMARSTAT == -8 ~ -8,
       W9DMARSTAT == -1 ~ -1,
-      TRUE ~ -2
+      TRUE ~ -3
     )
   )
 
@@ -368,7 +372,7 @@ partnr_all <- partnr_all %>%
       W8DMARSTAT == -9 ~ -9,
       W8DMARSTAT == -8 ~ -8,
       W8DMARSTAT == -1 ~ -1,
-      TRUE ~ -2
+      TRUE ~ -3
     ),
     
     partnradu32 = case_when(
@@ -376,12 +380,14 @@ partnr_all <- partnr_all %>%
       W9DMARSTAT == -9 ~ -9,
       W9DMARSTAT == -8 ~ -8,
       W9DMARSTAT == -1 ~ -1,
-      TRUE ~ -2
+      TRUE ~ -3
     )
   )
 
 #### region ####
 region_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% select(ID = NSID),
   S2 = read_dta(file.path(data_path, sweeps$S2familybackground)) %>%
     select(ID = NSID, regub15 = urbind, regov15 = gor),
   S3 = read_dta(file.path(data_path, sweeps$S3familybackground)) %>%
@@ -429,7 +435,8 @@ region_all <- region_all %>%
   ))
 
 #### education own ####
-region_vars <- list(
+educ_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
   S4 = read_dta(file.path(data_path, sweeps$S4youngperson )) %>%
     select(ID = NSID, educ17_raw = w4saim),
   S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>%
@@ -441,6 +448,83 @@ region_vars <- list(
   S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
     select(ID = NSID, starts_with("W9ACQU"), starts_with("W9VCQU"))
 )
+
+# Merge by ID
+educ_all <- reduce(educ_vars, full_join, by = "ID")
+
+educ_all <- educ_all %>%
+  mutate(
+    # Sweep 4
+    educ17 = case_when(
+      educ17_raw %in% 1:9 ~ 1,
+      educ17_raw == 10 ~ 0,
+      educ17_raw %in% 11:13 ~ -2,
+      educ17_raw == 14 ~ 0,
+      educ17_raw == -94 ~ -2,
+      educ17_raw == -91 ~ -1,
+      TRUE ~ -3  # Not interviewed/present
+    ),
+    
+    # Sweep 6
+    educ19 = case_when(
+      educ19_raw %in% 1:4 ~ 2,
+      educ19_raw %in% 5:13 ~ 1,
+      educ19_raw %in% 14:15 ~ -2,
+      educ19_raw == 16 ~ 0,
+      educ19_raw == -94 ~ -2,
+      educ19_raw == -91 ~ -1,
+      TRUE ~ -3
+    ),
+    
+    # Sweep 7
+    educ20 = case_when(
+      educ20_raw %in% 10:13 ~ 2,
+      educ20_raw %in% 3:9 ~ 1,
+      educ20_raw %in% 1:2 ~ 1,
+      educ20_raw == 14 ~ -2,
+      educ20_raw == -94 ~ -2,
+      educ20_raw == -91 ~ 0,
+      TRUE ~ -3
+    ),
+    
+    # Sweep 8
+    educ25 = case_when(
+      W8ACQU0A == 1 | W8ACQU0B == 1 | W8ACQU0C == 1 |
+        W8ACQU0D == 1 | W8ACQU0E == 1 |
+        W8VCQU0K == 1 | W8VCQU0L == 1 | W8VCQU0M == 1 ~ 2,
+     W8ACQU0F == 1 | W8ACQU0I == 1 | W8ACQU0L == 1 |
+        W8VCQU0I == 1 | W8VCQU0J == 1 |
+        W8VCQU0E == 1 | W8VCQU0G == 1 | W8VCQU0H == 1 ~ 1,
+     W8ACQU0O == 1 | W8VCQU0P == 1 ~ 0,
+     W8ACQU0Q == 1 | W8VCQU0R == 1 ~ -9,
+     W8ACQU0P == 1 | W8VCQU0Q == 1 ~ -8,
+     TRUE ~ -3
+    ),
+    
+    # Sweep 9
+    educ32 = case_when(
+      W9ACQUCHK == 1 | W9ACQU0A == 1 | W9ACQU0B == 1 | W9ACQU0C == 1 |
+        W9ACQU0D == 1 | W9ACQU0E == 1 | W9ACQU0F == 1 |
+        W9VCQU0A == 1 | W9VCQU0B == 1 | W9VCQU0C == 1 |
+        W9VCQU0S == 1 | W9VCQU0V == 1 | W9VCQUAC == 1 ~ 2,
+      W9ACQU0G == 1 | W9ACQU0H == 1 | W9ACQU0I == 1 | W9ACQU0J == 1 |
+        W9ACQU0K == 1 | W9ACQU0L == 1 | W9ACQU0M == 1 |
+        W9ACQU0O == 1 | W9ACQU0P == 1 | W9ACQU0Q == 1 |
+        W9VCQU0D == 1 | W9VCQU0G == 1 | W9VCQU0I == 1 |
+        W9VCQU0L == 1 | W9VCQU0O == 1 | W9VCQU0R == 1 |
+        W9VCQU0W == 1 | W9VCQU0Y == 1 | W9VCQUAD == 1 |
+        W9VCQU0E == 1 | W9VCQU0H == 1 | W9VCQU0J == 1 |
+        W9VCQU0M == 1 | W9VCQU0P == 1 | W9VCQU0T == 1 |
+        W9VCQU0X == 1 | W9VCQU0Z == 1 | W9VCQUAA == 1 |
+        W9VCQU0F == 1 | W9VCQU0K == 1 | W9VCQU0N == 1 |
+        W9VCQU0Q == 1 | W9VCQU0U == 1 | W9VCQUAB == 1 | W9VCQUAE == 1 ~ 1,
+      W9ACQU0N == 1 | W9ACQU0S == 1 | W9VCQUAG == 1 ~ 0,
+      W9ACQU0T == 1 | W9VCQUAH == 1 ~ -8,
+      W9ACQU0U == 1 | W9VCQUAI == 1 ~ -9,
+      TRUE ~ -3
+    )
+  )
+
 
 #### education parents ####
 # Step 1: Load and rename relevant variables from each sweep
@@ -463,29 +547,34 @@ parent_edu_all <- parent_edu_all %>%
     ~ case_when(
       .x == -92 ~ -9,
       .x == -91 ~ -1,
-      .x %in% c(-99, -98) ~ -3,
-      .x %in% c(-999, -94) ~ -2,
+      .x %in% c(-98) ~ -3,
+      .x %in% c(-999, -99, -94, 19) ~ -2,
       TRUE ~ .x
     )
   ))
 
-# Step 4: Derive educma (mother’s education)
+# Step 4: Derive full education/simple education
 parent_edu_all <- parent_edu_all %>%
   mutate(
+    #mother full education
     educma = case_when(
-      !is.na(educma_S1) & educma_S1 > 0 ~ educma_S1,
-      !is.na(educma_S2) & educma_S2 > 0 ~ educma_S2,
       !is.na(educma_S4) & educma_S4 > 0 ~ educma_S4,
-      !is.na(educma_S1) & educma_S1 < 0 ~ educma_S1,
-      !is.na(educma_S2) & educma_S2 < 0 ~ educma_S2,
+      !is.na(educma_S2) & educma_S2 > 0 ~ educma_S2,
+      !is.na(educma_S1) & educma_S1 > 0 ~ educma_S1,
       !is.na(educma_S4) & educma_S4 < 0 ~ educma_S4,
+      !is.na(educma_S2) & educma_S2 < 0 ~ educma_S2,
+      !is.na(educma_S1) & educma_S1 < 0 ~ educma_S1,
       TRUE ~ -3  # Not interviewed / present
-    )
-  )
-
-# Step 5: Derive educpa (father’s education)
-parent_edu_all <- parent_edu_all %>%
-  mutate(
+    ), 
+    #mother simple education
+    educma_simp = case_when(
+      educma %in% 1:4 ~ 2,
+      educma %in% 5:17 ~ 1,
+      educma == 18 ~ 0,
+      educma == 20 ~ 0,
+      TRUE ~ educma  # keep negatives as-is
+    ),
+    #father full education
     educpa = case_when(
       !is.na(educpa_S1) & educpa_S1 > 0 ~ educpa_S1,
       !is.na(educpa_S2) & educpa_S2 > 0 ~ educpa_S2,
@@ -494,5 +583,503 @@ parent_edu_all <- parent_edu_all %>%
       !is.na(educpa_S2) & educpa_S2 < 0 ~ educpa_S2,
       !is.na(educpa_S4) & educpa_S4 < 0 ~ educpa_S4,
       TRUE ~ -3
+    ),
+    #father simple education
+    educpa_simp = case_when(
+      educpa %in% 1:4 ~ 2,
+      educpa %in% 5:17 ~ 1,
+      educpa == 18 ~ 0,
+      educpa == 20 ~ 0,
+      TRUE ~ educpa  # keep negatives as-is
     )
+  )
+
+
+#### economic activity ####
+ecoact_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>%
+    select(ID = NSID, ecoact_S4 = W4empsYP),
+  S5 = read_dta(file.path(data_path, sweeps$S5youngperson)) %>%
+    select(ID = NSID, ecoact_S5 = W5mainactYP),
+  S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>%
+    select(ID = NSID, ecoact_S6 = W6TCurrentAct),
+  S7 = read_dta(file.path(data_path, sweeps$S7youngperson)) %>%
+    select(ID = NSID, ecoact_S7 = W7TCurrentAct),
+  S8 = read_dta(file.path(data_path, sweeps$S8derivedvariable)) %>%
+    select(ID = NSID, ecoact_S8 = W8DACTIVITYC),
+  S9 = read_dta(file.path(data_path, sweeps$S9derivedvariable)) %>%
+    select(ID = NSID, ecoact_S9 = W9DACTIVITYC)
+)
+
+# Merge by ID
+ecoact_all <- reduce(ecoact_vars, full_join, by = "ID")
+
+ecoact_all <- ecoact_all %>%
+  mutate(
+    ## Sweep 4
+    ecoact17 = case_when(
+      ecoact_S4 %in% 1:2 ~ 1,
+      ecoact_S4 == 4 ~ 2,
+      ecoact_S4 == 5 | ecoact_S4 == -91 ~ 3,
+      ecoact_S4 == 3 ~ 4,
+      ecoact_S4 == 6 ~ 5,
+      ecoact_S4 %in% c(7, 8, 9) ~ 6,
+      ecoact_S4 == -92 ~ -9,
+      ecoact_S4 == -999 ~ -2,
+      ecoact_S4 == -94 ~ -8,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 5
+    ecoact18 = case_when(
+      ecoact_S5 == 3 ~ 1,
+      ecoact_S5 %in% c(1, 5, 6) ~ 2,
+      ecoact_S5 %in% c(2, 4) ~ 3,
+      ecoact_S5 == 7 ~ 4,
+      ecoact_S5 == 8 ~ 5,
+      ecoact_S5 %in% 9:11 ~ 6,
+      ecoact_S5 == -94 ~ -8,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 6
+    ecoact19 = case_when(
+      ecoact_S6 == 3 ~ 1,
+      ecoact_S6 %in% c(4, 5) ~ 2,
+      ecoact_S6 %in% c(1, 2, 10) ~ 3,
+      ecoact_S6 == 8 ~ 4,
+      ecoact_S6 == 7 ~ 5,
+      ecoact_S6 %in% c(6, 9, 11) ~ 6,
+      ecoact_S6 == -91 ~ -8,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 7
+    ecoact20 = case_when(
+      ecoact_S7 == 3 ~ 1,
+      ecoact_S7 %in% c(4, 5, 11) ~ 2,
+      ecoact_S7 %in% c(1, 2, 9) ~ 3,
+      ecoact_S7 == 8 ~ 4,
+      ecoact_S7 == 7 ~ 5,
+      ecoact_S7 %in% c(6, 10, 12:15) ~ 6,
+      ecoact_S7 == -91 ~ -1,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 8
+    ecoact25 = case_when(
+      ecoact_S8 %in% c(1, 2) ~ 1,
+      ecoact_S8 %in% c(6, 7) ~ 2,
+      ecoact_S8 == 5 ~ 3,
+      ecoact_S8 == 4 ~ 4,
+      ecoact_S8 == 9 ~ 5,
+      ecoact_S8 %in% c(3, 8, 10) ~ 6,
+      ecoact_S8 == -9 ~ -9,
+      ecoact_S8 == -8 ~ -8,
+      ecoact_S8 == -1 ~ -1,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 9
+    ecoact32 = case_when(
+      ecoact_S9 %in% c(1, 2) ~ 1,
+      ecoact_S9 %in% c(6, 7) ~ 2,
+      ecoact_S9 == 5 ~ 3,
+      ecoact_S9 == 4 ~ 4,
+      ecoact_S9 == 9 ~ 5,
+      ecoact_S9 %in% c(3, 8, 10) ~ 6,
+      ecoact_S9 == -9 ~ -9,
+      ecoact_S9 == -8 ~ -8,
+      ecoact_S9 == -1 ~ -1,
+      TRUE ~ -3
+    ),
+    
+    ## Detailed versions (S8, S9 only)
+    ecoactadu25 = case_when(
+      !is.na(ecoact_S8) ~ ecoact_S8,
+      is.na(ecoact_S8) ~ -3
+    ),
+    ecoactadu32 = case_when(
+      !is.na(ecoact_S9) ~ ecoact_S9,
+      is.na(ecoact_S9) ~ -3
+    )
+  )
+
+#### economic activity parents ####
+# Load & select parental employment variables for Sweeps 1–4
+ecoactDT_parents_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1familybackground)) %>%
+    select(ID = NSID, ma_S1 = W1empsmum, pa_S1 = W1empsdad),
+  S2 = read_dta(file.path(data_path, sweeps$S2familybackground)) %>%
+    select(ID = NSID, ma_S2 = W2empsmum, pa_S2 = W2empsdad),
+  S3 = read_dta(file.path(data_path, sweeps$S3familybackground)) %>%
+    select(ID = NSID, ma_S3 = W3empsmum, pa_S3 = W3empsdad),
+  S4 = read_dta(file.path(data_path, sweeps$S4familybackground)) %>%
+    select(ID = NSID, ma_S4 = w4empsmum, pa_S4 = w4empsdad)
+)
+
+# Merge all
+ecoactDT_parents <- reduce(ecoactDT_parents_vars, full_join, by = "ID")
+
+# Recode helper function
+recode_detailed <- function(x) {
+  case_when(
+    x == 1 ~ 1,  # FT
+    x == 2 ~ 2,  # PT
+    x == 3 ~ 3,  # Unemployed
+    x == 4 ~ 4,  # Training
+    x == 5 ~ 5,  # Education
+    x == 6 ~ 6,  # Home
+    x == 7 ~ 7,  # Retired
+    x == 8 ~ 8,  # Sick/disabled
+    x == 9 ~ 9,  # Other
+    x == -94 ~ -8,
+    x == -999 ~ -2,
+    x %in% c(-98, -99) ~ -3,
+    is.na(x) ~ -3,
+    TRUE ~ NA_real_
+  )
+}
+
+# Apply recode to each sweep
+ecoactDT_parents <- ecoactDT_parents %>%
+  mutate(
+    EcoactDTma14 = recode_detailed(ma_S1),
+    EcoactDTpa14 = recode_detailed(pa_S1),
+    EcoactDTma15 = recode_detailed(ma_S2),
+    EcoactDTpa15 = recode_detailed(pa_S2),
+    EcoactDTma16 = recode_detailed(ma_S3),
+    EcoactDTpa16 = recode_detailed(pa_S3),
+    EcoactDTma17 = recode_detailed(ma_S4),
+    EcoactDTpa17 = recode_detailed(pa_S4)
+  )
+
+#### NS-SEC own ####
+nssec_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>%
+    select(ID = NSID, nssec_S4 = W4nsseccatYP),
+  S5 = read_dta(file.path(data_path, sweeps$S5youngperson)) %>%
+    select(ID = NSID, nssec_S5 = W5nsseccatYP),
+  S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>%
+    select(ID = NSID, nssec_S6 = w6nsseccatYP),
+  S7 = read_dta(file.path(data_path, sweeps$S7youngperson)) %>%
+    select(ID = NSID, nssec_S7 = W7NSSECCat),
+  S8 = read_dta(file.path(data_path, sweeps$S8derivedvariable)) %>%
+    select(ID = NSID, nssec_S8 = W8DNSSEC17),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, nssec_S9 = W9NSSEC)
+)
+
+nssec_all <- reduce(nssec_vars, full_join, by = "ID")
+
+nssec_all <- nssec_all %>%
+  mutate(
+    ## Sweep 4 (age 17)
+    Nsseccat17 = case_when(
+      is.na(nssec_S4) ~ -3,
+      floor(nssec_S4) %in% 1:17 ~ floor(nssec_S4),
+      nssec_S4 == -91 ~ -1,
+      nssec_S4 == -99 ~ -3,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 5 (age 18)
+    Nsseccat18 = case_when(
+      is.na(nssec_S5) ~ -3,
+      floor(nssec_S5) %in% 1:17 ~ floor(nssec_S5),
+      nssec_S5 == -91 ~ -1,
+      nssec_S5 == -99 ~ -3,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 6 (age 19)
+    Nsseccat19 = case_when(
+      is.na(nssec_S6) ~ -3,
+      floor(nssec_S6) %in% 1:17 ~ floor(nssec_S6),
+      nssec_S6 == -91 ~ -1,
+      nssec_S6 == -99 ~ -3,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 7 (age 20)
+    Nsseccat20 = case_when(
+      is.na(nssec_S7) ~ -3,
+      floor(nssec_S7) %in% 1:17 ~ floor(nssec_S7),
+      nssec_S7 == -91 ~ -1,
+      nssec_S7 == -99 ~ -3,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 8 (age 25)
+    Nsseccat25 = case_when(
+      is.na(nssec_S8) ~ -3,
+      floor(nssec_S8) %in% 1:14 ~ floor(nssec_S8),
+      nssec_S8 == -1 ~ -8,
+      TRUE ~ -3
+    ),
+    
+    ## Sweep 9 (age 32)
+    Nsseccat32 = case_when(
+      is.na(nssec_S9) ~ -3,
+      nssec_S9 %in% 1:17 ~ nssec_S9,
+      nssec_S9 == -9 ~ -9,
+      nssec_S9 == -8 ~ -8,
+      nssec_S9 == -1 ~ -1,
+      TRUE ~ NA_real_
+    )
+  )
+
+#### NS-SEC parents ####
+# Step 1: Load and select parental NS-SEC variables from Sweeps 1–5
+nssec_parents_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1familybackground)) %>%
+    select(ID = NSID, mum_S1 = W1nsseccatmum, dad_S1 = W1nsseccatdad),
+  S2 = read_dta(file.path(data_path, sweeps$S2familybackground)) %>%
+    select(ID = NSID, mum_S2 = W2nsseccatmum, dad_S2 = W2nsseccatdad),
+  S3 = read_dta(file.path(data_path, sweeps$S3familybackground)) %>%
+    select(ID = NSID, mum_S3 = W3cnsseccatmum, dad_S3 = W3cnsseccatdad),
+  S4 = read_dta(file.path(data_path, sweeps$S4familybackground)) %>%
+    select(ID = NSID, mum_S4 = w4cnsseccatmum, dad_S4 = w4cnsseccatdad),
+  S5 = read_dta(file.path(data_path, sweeps$S5familybackground)) %>%
+    select(ID = NSID, mum_S5 = w5Cnsseccatmum, dad_S5 = w5Cnsseccatdad)
+)
+
+nssec_parents <- reduce(nssec_parents_vars, full_join, by = "ID")
+
+# Step 2: Harmonise values (preserve decimals, apply missing codes)
+recode_nssec_detail <- function(x) {
+  case_when(
+    x %in% c(-999, -94) ~ -2,
+    x %in% c(-99, -98) | is.na(x) ~ -3,
+    TRUE ~ x
+  )
+}
+
+# Step 3: Apply recode and assign to derived variables
+nssec_parents <- nssec_parents %>%
+  mutate(
+    Nsseccatmum14 = recode_nssec_detail(mum_S1),
+    Nsseccatdad14 = recode_nssec_detail(dad_S1),
+    Nsseccatmum15 = recode_nssec_detail(mum_S2),
+    Nsseccatdad15 = recode_nssec_detail(dad_S2),
+    Nsseccatmum16 = recode_nssec_detail(mum_S3),
+    Nsseccatdad16 = recode_nssec_detail(dad_S3),
+    Nsseccatmum17 = recode_nssec_detail(mum_S4),
+    Nsseccatdad17 = recode_nssec_detail(dad_S4),
+    Nsseccatmum18 = recode_nssec_detail(mum_S5),
+    Nsseccatdad18 = recode_nssec_detail(dad_S5)
+  )
+
+
+#### income own ####
+income_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID), 
+  S8 = read_dta(file.path(data_path, sweeps$S8derivedvariable)) %>%
+    select(ID = NSID, income_S8 = W8DINCB),
+  S9 = read_dta(file.path(data_path, sweeps$S9derivedvariable)) %>%
+    select(ID = NSID, income_S9 = W9DINCB)
+)
+
+income_all <- reduce(income_vars, full_join, by = "ID")
+
+# Step 2: Recode
+income_all <- income_all %>%
+  mutate(
+    inc25 = case_when(
+      is.na(income_S8) ~ -3,
+      TRUE ~ income_S8
+    ),
+    inc32 = case_when(
+      is.na(income_S9) ~ -3,
+      TRUE ~ income_S9
+    )
+  )
+
+#### income parents ####
+# Step 1: Load and select household income variables
+hh_income_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1familybackground)) %>%
+    select(ID = NSID, income_S1 = W1GrsswkHH),
+  S2 = read_dta(file.path(data_path, sweeps$S2familybackground)) %>%
+    select(ID = NSID, income_S2 = W2GrsswkHH),
+  S3 = read_dta(file.path(data_path, sweeps$S3familybackground)) %>%
+    select(ID = NSID, income_S3 = W3incestw),
+  S4 = read_dta(file.path(data_path, sweeps$S4familybackground)) %>%
+    select(ID = NSID, income_S4 = w4IncEstW)
+)
+
+hh_income_all <- reduce(hh_income_vars, full_join, by = "ID")
+
+# Step 2: Derive banded income for continuous measures (S1–S2)
+convert_to_band <- function(x) {
+  case_when(
+    x < 0 ~ x,
+    x < 50 ~ 1,
+    x < 100 ~ 2,
+    x < 200 ~ 3,
+    x < 300 ~ 4,
+    x < 400 ~ 5,
+    x < 500 ~ 6,
+    x < 600 ~ 7,
+    x < 700 ~ 8,
+    x < 800 ~ 9,
+    x < 900 ~ 10,
+    x < 1000 ~ 11,
+    x >= 1000 ~ 12,
+    TRUE ~ -3
+  )
+}
+
+hh_income_all <- hh_income_all %>%
+  mutate(
+    # Sweep 1
+    incwhh14 = case_when(
+      is.na(income_S1) ~ -3,
+      income_S1 == -92 ~ -9,
+      income_S1 %in% c(-999, -992, -94) ~ -2,
+      income_S1 == -99 ~ -3,
+      income_S1 == -1 ~ -1,
+      income_S1 == -3 ~ -3,
+      TRUE ~ convert_to_band(income_S1)
+    ),
+    
+    # Sweep 2
+    incwhh15 = case_when(
+      is.na(income_S2) ~ -3,
+      income_S2 == -92 ~ -9,
+      income_S2 %in% c(-999, -992, -94) ~ -2,
+      income_S2 == -99 ~ -3,
+      income_S2 == -1 ~ -1,
+      income_S2 == -3 ~ -3,
+      TRUE ~ convert_to_band(income_S2)
+    ),
+    
+    # Sweep 3
+    incwhh16 = case_when(
+      is.na(income_S3) ~ -3,
+      income_S3 == -99 ~ -3,
+      income_S3 == -92 ~ -9,
+      income_S3 == -1 ~ -1,
+      income_S3 >= 1 & income_S3 <= 12 ~ income_S3,
+      TRUE ~ -3
+    ),
+    
+    # Sweep 4
+    incwhh17 = case_when(
+      is.na(income_S4) ~ -3,
+      income_S4 == -99 ~ -3,
+      income_S4 == -92 ~ -9,
+      income_S4 == -1 ~ -1,
+      income_S4 >= 1 & income_S4 <= 12 ~ income_S4,
+      TRUE ~ -3
+    )
+  )
+
+#### IMD ####
+imd_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>%select(ID = NSID),
+  S2 = read_dta(file.path(data_path, sweeps$S2familybackground)) %>%
+      select(ID = NSID, imd_S2 = IMDRSCORE),
+  S3 = read_dta(file.path(data_path, sweeps$S3familybackground)) %>%
+      select(ID = NSID, imd_S3 = IMDRSCORE),
+  S9 = read_dta(file.path(data_path, sweeps$S9derivedvariable)) %>%
+      select(ID = NSID, imd_S9 = W9DIMDD)
+  )
+  
+imd_all <- reduce(imd_vars, full_join, by = "ID")
+  
+# Step 2: Recode derived variables
+imd_all <- imd_all %>%
+    mutate(
+      Imd15 = case_when(
+        is.na(imd_S2) ~ -3,
+        imd_S2 == -94 ~ -8,
+        TRUE ~ imd_S2
+      ),
+      
+      Imd16 = case_when(
+        is.na(imd_S3) ~ -3,
+        imd_S3 == -94 ~ -8,
+        TRUE ~ imd_S3
+      ),
+      
+      Imd32 = case_when(
+        is.na(imd_S9) ~ -3,
+        imd_S9 == -8 ~ -8,
+        TRUE ~ imd_S9
+      )
+    )
+
+#### GHQ ####
+# Load GHQ-12 derived score and item-level data
+ghq_vars <- list(
+  S2 = read_dta(file.path(data_path, sweeps$S2youngperson)) %>%
+    select(ID = NSID, ghq15 = W2ghq12scr,
+           starts_with("W2"), ends_with("YP")),
+  
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>%
+    select(ID = NSID, ghq17 = W4ghq12scr,
+           starts_with("W4"), ends_with("YP")),
+  
+  S8 = read_dta(file.path(data_path, sweeps$S8maininterview)) %>%
+    select(ID = NSID, ghq25 = W8DGHQSC,
+           starts_with("W8GHQ12_")),
+  
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, ghq32 = W9DGHQSC,
+           starts_with("W9GHQ-12_"))
+)
+
+# Merge all sweeps by ID
+ghq_all <- reduce(ghq_vars, full_join, by = "ID")
+
+# Define item lists for sum scores
+ghq_items <- list(
+  ghqtl15 = paste0("W2", c("concenYP", "nosleepYP", "usefulYP", "decideYP", "strainYP", 
+                           "difficYP", "activYP", "probsYP", "depressYP", "noconfYP", 
+                           "wthlessYP", "happyYP")),
+  ghqtl17 = paste0("W4", c("ConcenYP", "NoSleepYP", "UsefulYP", "DecideYP", "StrainYP", 
+                           "DifficYP", "ActivYP", "ProbsYP", "DepressYP", "NoConfYP", 
+                           "WthlessYP", "HappyYP")),
+  ghqtl25 = paste0("W8GHQ12_", 1:12),
+  ghqtl32 = paste0("W9GHQ-12_", 1:12)
+)
+
+# Derive GHQ sum scores (0–12) with custom missing logic
+ghq_all <- ghq_all %>%
+  rowwise() %>%
+  mutate(
+    ghqtl15 = if (all(is.na(across(all_of(ghq_items$ghqtl15))))) -3 else 
+      if (any(across(all_of(ghq_items$ghqtl15)) %in% c(-97, -96, -92, -1))) -2 else 
+        sum(c_across(all_of(ghq_items$ghqtl15)), na.rm = TRUE),
+    
+    ghqtl17 = if (all(is.na(across(all_of(ghq_items$ghqtl17))))) -3 else 
+      if (any(across(all_of(ghq_items$ghqtl17)) %in% c(-97, -96, -92, -1))) -2 else 
+        sum(c_across(all_of(ghq_items$ghqtl17)), na.rm = TRUE),
+    
+    ghqtl25 = if (all(is.na(across(all_of(ghq_items$ghqtl25))))) -3 else 
+      if (any(across(all_of(ghq_items$ghqtl25)) == -1)) -1 else 
+        sum(c_across(all_of(ghq_items$ghqtl25)), na.rm = TRUE),
+    
+    ghqtl32 = if (all(is.na(across(all_of(ghq_items$ghqtl32))))) -3 else 
+      if (any(across(all_of(ghq_items$ghqtl32)) == -1)) -1 else 
+        sum(c_across(all_of(ghq_items$ghqtl32)), na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    ghq15 = case_when(
+      is.na(ghq15) ~ -3,
+      ghq15 %in% c(-97, -96, -92) ~ -9,
+      TRUE ~ ghq15
+    ),
+    ghq17 = case_when(
+      is.na(ghq17) ~ -3,
+      ghq17 %in% c(-97, -96, -92) ~ -9,
+      TRUE ~ ghq17
+    ),
+    ghq25 = if_else(is.na(ghq25), -3, ghq25),
+    ghq32 = if_else(is.na(ghq32), -3, ghq32)
   )
