@@ -4,3 +4,4 @@
 *.Rproj.user
 *.RData
 *.dta # Ignore all Stata data files
+.DS_Store
