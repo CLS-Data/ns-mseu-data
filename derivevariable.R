@@ -18,6 +18,7 @@ sweeps <- list(
   S3youngperson = "wave_three_lsype_young_person_2020.dta",
   S4familybackground = "wave_four_lsype_family_background_2020.dta",
   S4youngperson = "wave_four_lsype_young_person_2020.dta",
+  S4history = "wave_four_lsype_history_2020.dta",
   S5familybackground = "wave_five_lsype_family_background_2020.dta",
   S5youngperson = "wave_five_lsype_young_person_2020.dta",
   S6youngperson = "wave_six_lsype_young_person_2020.dta",
@@ -1082,4 +1083,552 @@ ghq_all <- ghq_all %>%
     ),
     ghq25 = if_else(is.na(ghq25), -3, ghq25),
     ghq32 = if_else(is.na(ghq32), -3, ghq32)
+  )
+#### life satisfaction ####
+# Load life satisfaction variables from each sweep
+lsat_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% select(ID = NSID),
+  S7 = read_dta(file.path(data_path, sweeps$S7youngperson)) %>%
+    select(ID = NSID, lsat20_raw = W7OSatisYP),
+  S8 = read_dta(file.path(data_path, sweeps$S8selfcompletion)) %>%
+    select(ID = NSID, lsat25_raw = W8OSATIS),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, lsat32_raw = W9OSATIS)
+)
+
+# Merge into a single dataset
+lsat_all <- reduce(lsat_vars, full_join, by = "ID")
+
+# Harmonise life satisfaction variables
+lsat_all <- lsat_all %>%
+  mutate(
+    lsat20 = case_when(
+      lsat20_raw %in% 1:5 ~ lsat20_raw,
+      lsat20_raw %in% c(-97, -92) ~ -9,
+      lsat20_raw == -91 ~ -1,
+      lsat20_raw == -1 ~ -8,
+      is.na(lsat20_raw) ~ -3,
+      TRUE ~ -2
+    ),
+    lsat25 = case_when(
+      lsat25_raw %in% 1:5 ~ lsat25_raw,
+      lsat25_raw == -9 ~ -9,
+      lsat25_raw == -8 ~ -8,
+      lsat25_raw == -1 ~ -1,
+      is.na(lsat25_raw) ~ -3,
+      TRUE ~ -2
+    ),
+    lsat32 = case_when(
+      lsat32_raw %in% 1:5 ~ lsat32_raw,
+      lsat32_raw == -9 ~ -9,
+      lsat32_raw == -8 ~ -8,
+      lsat32_raw == -1 ~ -1,
+      is.na(lsat32_raw) ~ -3,
+      TRUE ~ -2
+    )
+  )
+
+#### weight ####
+# Load weight variables from each sweep
+wt_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4history)) %>%
+    select(ID = NSID, wt0_raw = W4BirthWbHS),
+  S8 = read_dta(file.path(data_path, sweeps$S8maininterview)) %>%
+    select(ID = NSID, wt25_raw = W8WEIGHT),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, wt32_raw = W9WEIGHT)
+)
+
+# Merge datasets
+wt_all <- reduce(wt_vars, full_join, by = "ID")
+
+# Harmonise weight variables
+wt_all <- wt_all %>%
+  mutate(
+    wt0 = case_when(
+      wt0_raw > 0 ~ wt0_raw,
+      wt0_raw == -92 ~ -9,
+      wt0_raw == -91 ~ -1,
+      wt0_raw == -1 ~ -8,
+      wt0_raw %in% c(-996, -99) ~ -3,
+      is.na(wt0_raw) ~ -3,
+      TRUE ~ -2
+    ),
+    wt25 = case_when(
+      wt25_raw > 0 ~ wt25_raw,
+      wt25_raw == -9 ~ -9,
+      wt25_raw == -8 ~ -8,
+      wt25_raw == -1 ~ -1,
+      is.na(wt25_raw) ~ -3,
+      TRUE ~ -2
+    ),
+    wt32 = case_when(
+      wt32_raw > 0 ~ wt32_raw,
+      wt32_raw == -9 ~ -9,
+      wt32_raw == -8 ~ -8,
+      wt32_raw == -1 ~ -1,
+      is.na(wt32_raw) ~ -3,
+      TRUE ~ -2
+    )
+  )
+
+#### height ####
+# Load height data from sweeps 8 and 9
+ht_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% select(ID = NSID),
+  S8 = read_dta(file.path(data_path, sweeps$S8maininterview)) %>%
+    select(ID = NSID, ht25_raw = W8HEIGHT),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, ht32_raw = W9HEIGHT)
+)
+
+# Merge datasets
+ht_all <- reduce(ht_vars, full_join, by = "ID")
+
+# Recode height
+ht_all <- ht_all %>%
+  mutate(
+    ht25 = case_when(
+      ht25_raw > 0 ~ ht25_raw,
+      ht25_raw == -9 ~ -9,
+      ht25_raw == -8 ~ -8,
+      ht25_raw == -1 ~ -1,
+      TRUE ~ -3
+    ),
+    ht32 = case_when(
+      ht32_raw > 0 ~ ht32_raw,
+      ht32_raw == -9 ~ -9,
+      ht32_raw == -8 ~ -8,
+      ht32_raw == -1 ~ -1,
+      TRUE ~ -3
+    ),
+    ht25_32 = case_when(
+      ht32 > 0 ~ ht32,
+      ht25 > 0 ~ ht25,
+      ht32 %in% c(-9, -8, -1) ~ ht32,
+      ht25 %in% c(-9, -8, -1) ~ ht25, 
+      TRUE ~ -3  
+    )
+  )
+
+#### BMI ####
+bmi_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% select(ID = NSID),
+  S8 = read_dta(file.path(data_path, sweeps$S8derivedvariable)) %>%
+    select(ID = NSID, bmi25_raw = W8DBMI),
+  S9 = read_dta(file.path(data_path, sweeps$S9derivedvariable)) %>%
+    select(ID = NSID, bmi32_raw = W9DBMI)
+)
+
+bmi_all <- reduce(bmi_vars, full_join, by = "ID")
+
+bmi_all <- bmi_all %>%
+  mutate(
+    bmi25 = case_when(
+      bmi25_raw > 0 ~ bmi25_raw,
+      bmi25_raw == -9 ~ -9,
+      bmi25_raw == -8 ~ -8,
+      bmi25_raw == -1 ~ -1,
+      TRUE ~ -3
+    ),
+    bmi32 = case_when(
+      bmi32_raw > 0 ~ bmi32_raw,
+      bmi32_raw == -9 ~ -9,
+      bmi32_raw == -8 ~ -8,
+      bmi32_raw == -1 ~ -1,
+      TRUE ~ -3
+    )
+  )
+
+#### self-rated general health ####
+# Load relevant sweep files and select needed variables
+health_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% select(ID = NSID),
+  S2 = read_dta(file.path(data_path, sweeps$S2youngperson)) %>% 
+    select(ID = NSID, ghea15_raw = W2hea1cYP),
+  S3 = read_dta(file.path(data_path, sweeps$S3youngperson)) %>% 
+    select(ID = NSID, ghea16_raw = W3hea1cYP),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% 
+    select(ID = NSID, ghea17_raw = W4Hea1CYP),
+  S8 = read_dta(file.path(data_path, sweeps$S8maininterview)) %>% 
+    select(ID = NSID, ghea25_raw = W8GENA),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>% 
+    select(ID = NSID, ghea32_raw = W9HLTHGEN)
+)
+
+# Merge all data by ID
+health_all <- reduce(health_vars, full_join, by = "ID")
+
+# Harmonise adolescent responses (S2–S4): gheateenXX
+health_all <- health_all %>%
+  mutate(
+    gheateen15 = case_when(
+      ghea15_raw %in% c(1, 2, 3, 4) ~ ghea15_raw,
+      ghea15_raw %in% c(-998, -997, -995, -99, -94) ~ -2,
+      ghea15_raw %in% c(-97, -96, -92, -1) ~ -8,
+      ghea15_raw == -91 ~ -1,
+      TRUE ~ -3
+      ),  
+    gheateen16 = case_when(
+      ghea16_raw %in% c(1, 2, 3, 4) ~ ghea16_raw,
+      ghea16_raw %in% c(-998, -997, -995, -99, -94) ~ -2,
+      ghea16_raw %in% c(-97, -96, -92, -1) ~ -8,
+      ghea16_raw == -91 ~ -1,
+      TRUE ~ -3
+    ),
+    gheateen17 = case_when(
+      ghea17_raw %in% c(1, 2, 3, 4) ~ ghea17_raw,
+      ghea17_raw %in% c(-998, -997, -995, -99, -94) ~ -2,
+      ghea17_raw %in% c(-97, -96, -92, -1) ~ -8,
+      ghea17_raw == -91 ~ -1,
+      TRUE ~ -3
+    )
+  )
+
+# Harmonise adult responses (S8–S9): gheaaduXX
+health_all <- health_all %>%
+  mutate(
+    gheaadu25 = case_when(
+      ghea25_raw %in% c(1, 2, 3, 4, 5) ~ ghea25_raw,
+      ghea25_raw == -8 ~ -8,
+      ghea25_raw == -1 ~ -1,
+      ghea25_raw == -9 ~ -9,
+      TRUE ~ -3
+    ),
+    gheaadu32 = case_when(
+      ghea32_raw %in% c(1, 2, 3, 4, 5) ~ ghea32_raw,
+      ghea32_raw == -8 ~ -8,
+      ghea32_raw == -1 ~ -1,
+      ghea32_raw == -9 ~ -9,
+      TRUE ~ -3
+    )
+  )
+
+# Binary general health: 1 = poor/fair, 0 = good/excellent
+health_all <- health_all %>%
+  mutate(
+    ghea15 = case_when(gheateen15 %in% c(3, 4) ~ 1,
+                       gheateen15 %in% c(1, 2) ~ 0,
+                       TRUE ~ gheateen15),
+    ghea16 = case_when(gheateen16 %in% c(3, 4) ~ 1,
+                       gheateen16 %in% c(1, 2) ~ 0,
+                       TRUE ~ gheateen16),
+    ghea17 = case_when(gheateen17 %in% c(3, 4) ~ 1,
+                       gheateen17 %in% c(1, 2) ~ 0,
+                       TRUE ~ gheateen17),
+    ghea25 = case_when(gheaadu25 %in% c(4, 5) ~ 1,
+                       gheaadu25 %in% c(1, 2, 3) ~ 0,
+                       TRUE ~ gheaadu25),
+    ghea32 = case_when(gheaadu32 %in% c(4, 5) ~ 1,
+                       gheaadu32 %in% c(1, 2, 3) ~ 0,
+                       TRUE ~ gheaadu32)
+  )
+
+#### long-term illness ####
+# Load relevant sweep files and select needed variables
+long_term_illness_files <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% 
+    select(ID = NSID, lsi14_raw = W1chea1HS),
+  S2 = read_dta(file.path(data_path, sweeps$S2youngperson)) %>% 
+    select(ID = NSID, lsi15_raw = W2chea1HS),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% 
+    select(ID = NSID, lsi17_raw = W4Hea2YP),
+  S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>% 
+    select(ID = NSID, lsi19_raw = W6HealthYP),
+  S7 = read_dta(file.path(data_path, sweeps$S7youngperson)) %>% 
+    select(ID = NSID, lsi20_raw = W7HealthYP),
+  S8 = read_dta(file.path(data_path, sweeps$S8maininterview)) %>% 
+    select(ID = NSID, lsi25_raw = W8LOIL),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>% 
+    select(ID = NSID, lsi32_raw = W9LOIL)
+)
+
+# Merge all data
+lsi_all <- reduce(long_term_illness_files, full_join, by = "ID")
+
+# Harmonise values
+recode_lsi <- function(x) {
+  case_when(
+    x == 1 ~ 1,
+    x == 2 ~ 0,
+    x %in% c(-92, -9) ~ -9,
+    x == -1 ~ -1,
+    x %in% c(-998, -997, -995, -99, -98, -97) ~ -2,
+    x %in% c(-91, -8) ~ -8,
+    TRUE ~ -3  # Not present/interviewed or NA
+  )
+}
+
+lsi_all <- lsi_all %>%
+  mutate(
+    lsi14_15 = case_when(
+      !is.na(lsi14_raw) ~ recode_lsi(lsi14_raw),
+      !is.na(lsi15_raw) ~ recode_lsi(lsi15_raw),
+      TRUE ~ -3
+    ),
+    lsi17 = recode_lsi(lsi17_raw),
+    lsi19 = recode_lsi(lsi19_raw),
+    lsi20 = recode_lsi(lsi20_raw),
+    lsi25 = recode_lsi(lsi25_raw),
+    lsi32 = recode_lsi(lsi32_raw)
+  )
+
+#### smoke ####
+# Load smoking data from relevant sweeps
+smoking_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>%
+    select(ID = NSID, smknw14_raw = W1cignowYP, smk14_raw = W1cigfreqYP),
+  S2 = read_dta(file.path(data_path, sweeps$S2youngperson)) %>%
+    select(ID = NSID, smknw15_raw = W2cignowYP, smk15_raw = W2cigfreqYP),
+  S3 = read_dta(file.path(data_path, sweeps$S3youngperson)) %>%
+    select(ID = NSID, smknw16_raw = W3cignowYP, smk16_raw = W3cigfreqYP),
+  S8 = read_dta(file.path(data_path, sweeps$S8selfcompletion)) %>%
+    select(ID = NSID, smk25_raw = W8SMOKING),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, smk32_raw = W9SMOKING)
+)
+
+# Merge all sweeps
+smoking_all <- reduce(smoking_vars, full_join, by = "ID")
+
+# Recode smoke ever/frequency
+recode_smk14_16 <- function(x) {
+  case_when(
+    x %in% c(1, 2, -91) ~ 0,
+    x == 3 ~ 1,
+    x %in% c(4, 5) ~ 2,
+    x == 6 ~ 3,
+    x %in% c(-99, -97, -96) ~ -2,
+    x == -92 ~ -9,
+    x == -1 ~ -8,
+    TRUE ~ -3
+  )
+}
+
+recode_smk25_32 <- function(x) {
+  case_when(
+    x > 0 ~ x - 1, # Convert 1-4 to 0-3
+    x == -9 ~ -9,
+    x == -8 ~ -8,
+    x == -1 ~ -1,
+    TRUE ~ -3
+  )
+}
+
+# Recode smoke now
+recode_smknw14_16 <- function(x) {
+  case_when(
+    x == 1 ~ 1,
+    x == 2 ~ 0,
+    x %in% c(-99, -97, -96) ~ -2,
+    x == -92 ~ -9,
+    x == -91 ~ -1,
+    x == -1 ~ -8,
+    TRUE ~ -3
+  )
+}
+
+recode_smknw25_32 <- function(x) {
+  case_when(
+    x %in% c(1, 2) ~ 0,
+    x %in% c(3, 4) ~ 1, 
+    x == -9 ~ -9,
+    x == -1 ~ -1,
+    x == -8 ~ -8,
+    TRUE ~ -3
+  )
+}
+
+# Apply recoding
+smoking_all <- smoking_all %>%
+  mutate(
+    smk14 = recode_smk14_16(smk14_raw),
+    smk15 = recode_smk14_16(smk15_raw),
+    smk16 = recode_smk14_16(smk16_raw),
+    smk25 = recode_smk25_32(smk25_raw),
+    smk32 = recode_smk25_32(smk32_raw),
+    
+    smknw14 = recode_smknw14_16(smknw14_raw),
+    smknw15 = recode_smknw14_16(smknw15_raw),
+    smknw16 = recode_smknw14_16(smknw16_raw),
+    smknw25 = recode_smknw25_32(smk25_raw),
+    smknw32 = recode_smknw25_32(smk32_raw)
+  )
+
+#### alcohol ####
+# Load and Select Variables
+alc_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>% 
+    select(ID = NSID, alcever_S1 = W1alceverYP, alcmon_S1 = W1alcmonYP, alcfreq_S1 = W1alcfreqYP),
+  S2 = read_dta(file.path(data_path, sweeps$S2youngperson)) %>% 
+    select(ID = NSID, alcever_S2 = W2alceverYP, alcfreq_S2 = W2alcfreqYP),
+  S3 = read_dta(file.path(data_path, sweeps$S3youngperson)) %>% 
+    select(ID = NSID, alcever_S3 = W3alceverYP, alcfreq_S3 = W3alcfreqYP),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>% 
+    select(ID = NSID, alcever_S4 = W4AlcEverYP, alcfreq_S4 = W4AlcFreqYP),
+  S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>% 
+    select(ID = NSID, alcever_S6 = W6AlcEverYP, alcfreq_S6 = W6AlcFreqYP),
+  S7 = read_dta(file.path(data_path, sweeps$S7youngperson)) %>% 
+    select(ID = NSID, alcever_S7 = W7AlcEverYP, alcfreq_S7 = W7AlcFreqYP),
+  S8 = read_dta(file.path(data_path, sweeps$S8selfcompletion)) %>% 
+    select(ID = NSID, 
+           audita25 = W8AUDIT1, auditb25 = W8AUDIT2, auditc25 = W8AUDIT6),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>% 
+    select(ID = NSID, 
+           audita32 = W9AUDIT1, auditb32 = W9AUDIT2, auditc32 = W9AUDIT3)
+)
+
+alc_all <- reduce(alc_vars, full_join, by = "ID")
+
+# First Time Had Alcohol 
+alc_all <- alc_all %>%
+  rowwise() %>%
+  mutate(
+    ever_flags = list(c(
+      ifelse(alcever_S1 == 1 & alcmon_S1 == 1, 14, NA),
+      ifelse(alcever_S2 == 1, 15, NA),
+      ifelse(alcever_S3 == 1, 16, NA),
+      ifelse(alcever_S4 == 1, 17, NA),
+      ifelse(alcever_S6 == 1, 19, NA),
+      ifelse(alcever_S7 == 1, 20, NA),
+      ifelse(audita25 > 1, 25, NA),
+      ifelse(audita32 > 1, 32, NA)
+    )),
+    alcfst = case_when(
+      any(ever_flags %in% 14:32, na.rm = TRUE) ~ min(unlist(ever_flags), na.rm = TRUE),
+      all(c(alcever_S1, alcever_S2, alcever_S3, alcever_S4, alcever_S6, alcever_S7) == 2&c(audita25, audita32) == 1, na.rm = TRUE) ~ 99,
+      TRUE ~ -8
+    )
+  ) %>%
+  ungroup()
+
+# Frequency Recode Across Sweeps
+recode_freq <- function(x, sweep) {
+  case_when(
+    sweep %in% c("S1", "S2", "S3", "S4") ~ case_when(
+      x == 1 ~ 4, 
+      x == 2 ~ 3, 
+      x == 3 ~ 2, 
+      x == 4 ~ 2, 
+      x == 5 ~ 1, 
+      x == 6 ~ 0,
+      x %in% c(-99, -97, -96) ~ -2,
+      x == -92 ~ -9,
+      x == -1 ~ -1,
+      x == -91 ~ -1,
+      TRUE ~ -3
+    ),
+    sweep %in% c("S6", "S7") ~ case_when(
+      x %in% c(1, 2) ~ 4,
+      x %in% c(3, 4) ~ 3,
+      x == 5 ~ 2,
+      x == 6 ~ 1,
+      x %in% c(7, 8) ~ 0,
+      x == -997 ~ -2,
+      x == -97 ~ -9,
+      x == -92 ~ -9,
+      x == -91 ~ -1,
+      x == -1 ~ -1,
+      TRUE ~ -3
+    )
+  )
+}
+
+# Frequency Variables 
+alc_all <- alc_all %>%
+  mutate(
+    alcfreq14 = recode_freq(alcfreq_S1, "S1"),
+    alcfreq15 = recode_freq(alcfreq_S2, "S2"),
+    alcfreq16 = recode_freq(alcfreq_S3, "S3"),
+    alcfreq19 = recode_freq(alcfreq_S6, "S6"),
+    alcfreq20 = recode_freq(alcfreq_S7, "S7")
+  )
+
+# ---- AUDIT Recode ----
+recode_audit <- function(x) {
+  case_when(
+    x >= 0 & x <= 5 ~ x - 1,
+    x == -9 ~ -9,
+    x == -8 ~ -8,
+    x == -1 ~ -1,
+    TRUE ~ -3
+  )
+}
+
+alc_all <- alc_all %>%
+  mutate(
+    audita25 = recode_audit(audita25),
+    audita32 = recode_audit(audita32),
+    auditb25 = recode_audit(auditb25),
+    auditb32 = recode_audit(auditb32),
+    auditc25 = recode_audit(auditc25),
+    auditc32 = recode_audit(auditc32)
+  )
+
+#### exercise ####
+# Load relevant sweep files and select variables
+exercise_vars <- list(
+  S1 = read_dta(file.path(data_path, sweeps$S1youngperson)) %>%
+    select(ID = NSID, spt14_raw = W1sportYP),
+  S2 = read_dta(file.path(data_path, sweeps$S2youngperson)) %>%
+    select(ID = NSID, spt15_raw = W2sportYP),
+  S4 = read_dta(file.path(data_path, sweeps$S4youngperson)) %>%
+    select(ID = NSID, spt17_raw = W4SportYP),
+  S6 = read_dta(file.path(data_path, sweeps$S6youngperson)) %>%
+    select(ID = NSID, spt19_raw = W6SportYP),
+  S7 = read_dta(file.path(data_path, sweeps$S7youngperson)) %>%
+    select(ID = NSID, spt20_raw = W7SportYP),
+  S8 = read_dta(file.path(data_path, sweeps$S8maininterview)) %>%
+    select(ID = NSID, spt25_raw = W8EXERCISE),
+  S9 = read_dta(file.path(data_path, sweeps$S9maininterview)) %>%
+    select(ID = NSID, spt32_raw = W9EXERCISEH)
+)
+
+# Merge all datasets
+spt_all <- reduce(exercise_vars, full_join, by = "ID")
+
+# Recode function
+recode_exercise <- function(x) {
+  case_when(
+    x %in% c(1, 2, 3) ~ x - 1,      # Keep as is
+    x %in% c(4, 5, 6) ~ 3,     # 4- 6 = less than once a week/hardly ever/never
+    x == -92 ~ -9,          # Refused
+    x %in% c(-91) ~ -1,     # Not applicable / insufficient info
+    x %in% c(-99) ~ -3,     # Not interviewed
+    TRUE ~ -3              # Everything else = error/lost
+  )
+}
+
+# Apply recoding
+spt_all <- spt_all %>%
+  mutate(
+    spt14 = recode_exercise(spt14_raw),
+    spt15 = recode_exercise(spt15_raw),
+    spt17 = recode_exercise(spt17_raw),
+    spt19 = recode_exercise(spt19_raw),
+    spt20 = recode_exercise(spt20_raw),  
+    spt25 = case_when( # values from 0–7 days
+      spt25_raw %in% c(5, 6, 7)  ~ 0,
+      spt25_raw %in% c(2, 3, 4) ~ 1,
+      spt25_raw == 1 ~ 2,
+      spt25_raw == 0 ~ 3,
+      spt25_raw == -9 ~ -9,
+      spt25_raw == -8 ~ -8,
+      spt25_raw == -1 ~ -1,
+      TRUE ~ -3
+    ),
+    spt32 = case_when(
+      spt32_raw %in% c(5, 6, 7)  ~ 0,
+      spt32_raw %in% c(2, 3, 4) ~ 1,
+      spt32_raw == 1 ~ 2,
+      spt32_raw  == 0 ~ 3,
+      spt32_raw == -9 ~ -9,
+      spt32_raw == -8 ~ -8,
+      spt32_raw == -1 ~ -1,
+      TRUE ~ -3
+    )
   )
