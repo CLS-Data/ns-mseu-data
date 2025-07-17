@@ -6,4 +6,3 @@
 *.dta # Ignore all Stata data files
 .DS_Store
 .Rproj.user
-*.csv
